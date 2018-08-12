@@ -19,72 +19,59 @@ import java.util.List;
  * @date 2018年08月05日 下午10:46
  */
 @NoArgsConstructor
+@Getter
+@Setter
 public class ExcelTemplate {
     protected Logger logger = LoggerFactory.getLogger(ExcelTemplate.class);
 
     /**
      *
      */
-    @Getter
     private List staticObject = null;
 
     /**
      *
      */
-    @Getter
     private List parameterObject = null;
 
     /**
      *
      */
-    @Getter
     private List fieldObject = null;
 
     /**
      *
      */
-    @Getter
     private List variableObject = null;
 
     /**
      *
      */
-    @Getter
-    @Setter
     private String templatePath = null;
 
     /**
      *
      */
-    @Getter
-    @Setter
     private boolean multiParamTemplate = false;
 
     /**
      *
      */
-    @Getter
-    @Setter
     private int paramSheetNum = 1;
 
     /**
      *
      */
-    @Getter
-    @Setter
     private int skipSheets = 0;
 
     /**
      *
      */
-    @Getter
-    @Setter
     private String cleanTheDoc = null;
 
     /**
      *
      */
-    @Getter
     private List<HashMap<String, List>> mObjectList = new ArrayList<HashMap<String, List>>();
 
     public ExcelTemplate(String pTemplatePath) {

@@ -91,7 +91,6 @@ public class ExcelFillerUtils extends ExcelFiller {
     }
 
 
-
     public void write() {
         try {
             wwb.write();
@@ -142,7 +141,7 @@ public class ExcelFillerUtils extends ExcelFiller {
     public void fillParameters(WritableSheet wSheet, Integer sheetIdx) {
         List parameters = null;
         if (getExcelTemplate().isMultiParamTemplate()) {
-            parameters = getExcelTemplate().getParameterObjct(sheetIdx);
+            parameters = getExcelTemplate().getParameterObject(sheetIdx);
         } else {
             parameters = getExcelTemplate().getParameterObject();
         }
@@ -373,6 +372,15 @@ public class ExcelFillerUtils extends ExcelFiller {
             System.out.println("表体单元格样式设置失败！");
         }
         return bodyFormat;
+    }
+
+    /**
+     * 删除多余的sheet row column(反序删，序号从大到小）
+     *
+     * @param cleanTheDoc sheetIndex:R|C|S:endRowIndex|endColumnIndex|endSheetIndex:deleteLength[,REPEAT]
+     */
+    public void cleanTheDoc(String cleanTheDoc) {
+        this.cleanTheDoc(cleanTheDoc, wwb);
     }
 
     public void addSheet(String sheetName) {

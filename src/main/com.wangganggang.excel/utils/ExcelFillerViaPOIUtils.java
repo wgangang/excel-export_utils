@@ -9,6 +9,7 @@ import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
@@ -34,15 +35,21 @@ public class ExcelFillerViaPOIUtils extends ExcelFiller {
      */
     private WritableWorkbook wwb = null;
     private int sheetIndex = 0;
+
+    @Setter
     private String sheetName = "";
+
     @Getter
     private HSSFWorkbook hwb = null;
+
+    @Getter
     private ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     /**
      * 用户自定义样式：false表示使用模板原有样式；true表示使用自定义的样式
      */
     @Getter
+    @Setter
     private boolean customStyle = true;
 
     private HSSFCellStyle bodyHCs = null;

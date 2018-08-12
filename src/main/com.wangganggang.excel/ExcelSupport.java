@@ -49,7 +49,7 @@ public class ExcelSupport {
      * 判断对象是否Empty(null或元素为0)<br>
      * 实用于对如下对象做判断:String Collection及其子类 Map及其子类
      *
-     * @param pObj 待检查对象
+     * @param object 待检查对象
      * @return boolean 返回的布尔值
      */
     public static boolean isEmpty(Object object) {

@@ -7,6 +7,7 @@ import com.wangganggang.excel.ExcelTemplate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -19,14 +20,14 @@ import java.util.Map;
 
 /**
  * @author wangganggang
- * @date 2018年08月06日 上午12:06
+ * @date 2018年08月12日 下午5:36
  */
 @NoArgsConstructor
 @Getter
 @Setter
-public class ExcelUtils extends ExcelExporter {
+public class ExcelViaPOIUtils extends ExcelExporter {
 
-    private String fileName = "Excel.xls";
+    private String filename = "Excel.xls";
 
     private String sheetName = "";
 
@@ -45,27 +46,65 @@ public class ExcelUtils extends ExcelExporter {
     /**
      * 是否样本sheet个数
      */
-    private int paramSheetNum = 1;
+    private int paramSheetNums = 1;
 
-
-    public ExcelUtils(List<Map> list) {
+    public ExcelViaPOIUtils(List<Map> list) {
         this.list = list;
     }
 
-
-    @Override
-    public void export(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("application/vnd.ms-excel");
-        fileName = ExcelSupport.encodeChineseDownloadFileName(request, getFileName());
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ";");
+    /**
+     * 导出Excel
+     *
+     * @return
+     * @throws IOException
+     */
+    public HSSFWorkbook export() throws IOException {
 
         ExcelTemplate excelTemplate = new ExcelTemplate();
         excelTemplate.setTemplatePath(getTemplatePath());
         excelTemplate.setMultiParamTemplate(multiParamTemplate);
-        excelTemplate.setParamSheetNum(paramSheetNum);
+        excelTemplate.setParamSheetNum(paramSheetNums);
         excelTemplate.parse();
 
-        ExcelFillerUtils excelFillerUtils = new ExcelFillerUtils(excelTemplate);
+        ExcelFillerViaPOIUtils excelFillerViaPOIUtils = new ExcelFillerViaPOIUtils(excelTemplate);
+        for (int i = 0; i < this.list.size(); i++) {
+            Map map = (Map) list.get(i);
+            Map dto = (Map) map.get("parametersMap");
+            List fList = (List) map.get("fieldsList");
+            ExcelData excelData = new ExcelData(dto, fList);
+            excelFillerViaPOIUtils.setExcelData(excelData);
+            if (getSheetName() != null && !"".equals(getSheetName())) {
+                excelFillerViaPOIUtils.setSheetName(getSheetName());
+            }
+            if (getCustomStyle(i) != null) {
+                excelFillerViaPOIUtils.setCustomStyle(getCustomStyle(i));
+            }
+            excelFillerViaPOIUtils.fill(i);
+        }
+        return excelFillerViaPOIUtils.getHwb();
+    }
+
+    /**
+     * 导出Excel
+     *
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    @Override
+    public void export(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.ms-excel");
+        filename = ExcelSupport.encodeChineseDownloadFileName(request, getFilename());
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename + ";");
+
+        ExcelTemplate excelTemplate = new ExcelTemplate();
+        excelTemplate.setTemplatePath(getTemplatePath());
+        excelTemplate.setMultiParamTemplate(multiParamTemplate);
+        excelTemplate.setParamSheetNum(paramSheetNums);
+        excelTemplate.parse();
+
+        // ExcelFiller excelFiller = new ExcelFiller(excelTemplate, excelData);
+        ExcelFillerViaPOIUtils excelFillerViaPOIUtils = new ExcelFillerViaPOIUtils(excelTemplate);
         ByteArrayOutputStream bos = null;
         ServletOutputStream os = null;
         for (int i = 0; i < this.list.size(); i++) {
@@ -73,32 +112,38 @@ public class ExcelUtils extends ExcelExporter {
             Map dto = (Map) map.get("parametersMap");
             List fList = (List) map.get("fieldsList");
             ExcelData excelData = new ExcelData(dto, fList);
-            excelFillerUtils.setExcelData(excelData);
-            // ByteArrayOutputStream bos = excelFiller.fill();
+            excelFillerViaPOIUtils.setExcelData(excelData);
             if (getSheetName() != null && !"".equals(getSheetName())) {
-                excelFillerUtils.setSheetName(getSheetName());
+                excelFillerViaPOIUtils.setSheetName(getSheetName());
             }
             if (getCustomStyle(i) != null) {
-                excelFillerUtils.setCustomStyle(getCustomStyle(i));
+                excelFillerViaPOIUtils.setCustomStyle(getCustomStyle(i));
             }
-            excelFillerUtils.fill(i);
+            excelFillerViaPOIUtils.fill(i);
         }
-        excelFillerUtils.write();
-        bos = excelFillerUtils.getOutputStream();
+        excelFillerViaPOIUtils.write();
+        bos = excelFillerViaPOIUtils.getOutputStream();
         os = response.getOutputStream();
         os.write(bos.toByteArray());
         os.flush();
         os.close();
     }
 
+    /**
+     * 导出Excel
+     *
+     * @param request
+     * @param response
+     * @throws IOException
+     */
     public void export(HttpServletRequest request, HttpServletResponse response, ExcelTemplate excelTemplate) throws IOException {
         response.setContentType("application/vnd.ms-excel");
-        fileName = ExcelSupport.encodeChineseDownloadFileName(request, getFileName());
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ";");
+        filename = ExcelSupport.encodeChineseDownloadFileName(request, getFilename());
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename + ";");
 
         excelTemplate.setTemplatePath(getTemplatePath());
         excelTemplate.setMultiParamTemplate(multiParamTemplate);
-        excelTemplate.setParamSheetNum(paramSheetNum);
+        excelTemplate.setParamSheetNum(paramSheetNums);
         excelTemplate.parse();
 
         // ExcelFiller excelFiller = new ExcelFiller(excelTemplate, excelData);
@@ -132,7 +177,6 @@ public class ExcelUtils extends ExcelExporter {
         os.flush();
         os.close();
     }
-
 
     public Boolean getCustomStyle(int i) {
         return this.customStyle == null || this.customStyle.length == 0 ? null : this.customStyle[i];

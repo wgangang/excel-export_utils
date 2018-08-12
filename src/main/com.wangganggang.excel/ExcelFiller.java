@@ -26,7 +26,6 @@ import java.util.Objects;
  * @date 2018年08月05日 下午11:30
  * @desc Excel数据填充器
  */
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -36,6 +35,11 @@ public class ExcelFiller {
     private ExcelTemplate excelTemplate = null;
 
     private ExcelData excelData = null;
+
+    public ExcelFiller(ExcelTemplate excelTemplate, ExcelData excelData) {
+        this.excelTemplate = excelTemplate;
+        this.excelData = excelData;
+    }
 
     public ByteArrayOutputStream fill() {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
